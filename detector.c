@@ -26,6 +26,10 @@ int runCommand(char *command);
 int runCommand(char *command){
     int outputSize=MAXSIZE+1;
     char *outputString=calloc(outputSize, sizeof(char));
+    if(outputString==NULL){
+        perror("calloc");
+        exit(0);
+    }
     memset(outputString, 0, MAXSIZE);
     int pipes[2];
     if(pipe(pipes)==-1){
@@ -38,13 +42,16 @@ int runCommand(char *command){
         close(pipes[0]);
         close(pipes[1]);
         execlp("/bin/sh","sh", "-c", command, NULL);
-        // exit(5);
     }else if(pid==-1){
         perror("Fork");
         exit(0);
     }else
     {   close(pipes[1]);
         char *readChar=calloc(1024+1, sizeof(char));
+        if(readChar==NULL){
+            perror("Calloc");
+            exit(0);
+        }
         int nbBytes=0;
         int nbRead=0;
         while((nbBytes=read(pipes[0], readChar, 1024))>0){
@@ -52,6 +59,10 @@ int runCommand(char *command){
             if(nbRead>outputSize){
                 outputSize=nbRead+1;
                 outputString=realloc(outputString, outputSize);
+                if(outputString==NULL){
+                    perror("Realloc");
+                    exit(0);
+                }
             }
             strcat(outputString, readChar);
             memset(readChar, 0, 1025);
@@ -60,14 +71,17 @@ int runCommand(char *command){
         int status;
         wait(&status);
         if(WIFEXITED(status)){
-            // printf("child exits with status %d\n", WEXITSTATUS(status));
             if(strcmp(previousOutput, outputString)==0){
-                // printf("child exits with status %d\n", WEXITSTATUS(status));
-                // printf("The same output!\n");
+                printf("\n");
             }else{
                 previousOutput=calloc(outputSize, sizeof(char));
+                if(previousOutput==NULL){
+                    perror("Calloc");
+                    exit(0);
+                }
                 strcpy(previousOutput, outputString);
-                printf("\nthe output is\n %s\n", outputString);
+                printf("%s\n", outputString);
+                printf("exit %d\n", WEXITSTATUS(status));
             }
         }
         return WEXITSTATUS(status);
@@ -75,12 +89,19 @@ int runCommand(char *command){
 }
 int main(int argc, char *argv[])
 {
-    // fclose(stderr);
     int progStartIndex=-1;
     int opt=-1;
     char **argv2=calloc(argc, sizeof(char *));
+    if(argv2==NULL){
+        perror("Calloc");
+        exit(0);
+    }
     for(int i=0;i<argc;i++){
         argv2[i]=calloc(100, sizeof(char));
+        if(argv2[i]==NULL){
+            perror("Calloc");
+            exit(0);
+        }
         strcpy(argv2[i], argv[i]);
     }
     while((opt=getopt(argc, argv, "+ci:t:l:"))!=-1){
@@ -121,7 +142,6 @@ int main(int argc, char *argv[])
                 break;
         }
     }
-    // printf("optind %d\n", optind);
     progStartIndex=optind;
     int length=argc-progStartIndex;
     char command[256];
@@ -131,6 +151,10 @@ int main(int argc, char *argv[])
     printf("command: %s\n", command);
 
     previousOutput=calloc(MAXSIZE+1, sizeof(char));
+    if(previousOutput==NULL){
+        perror("Calloc");
+        exit(0);
+    }
     int counter=0;
     while(counter<limitOfIterations || limitSet==false){
         if(timeFormatSet){
@@ -141,10 +165,6 @@ int main(int argc, char *argv[])
             printf("%s\n", currentTime);
         }
         int exitStatus=runCommand(command);
-        if(counter==0){
-            printf("exit %d\n", exitStatus);
-            }
-        // else printf(" ");
         usleep(interval*1000);
         counter++;
     }
