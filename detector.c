@@ -6,8 +6,8 @@
 #include <getopt.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <time.h>
 #include <sys/mman.h>
+#include <time.h>
 
 #define MAXSIZE 4096
 bool printReturnCode=false;
@@ -18,7 +18,6 @@ bool intervalSet=false;
 int interval=10000;//in millis
 char timeFormat[100];
 int limitOfIterations=0;//0 for infinity
-
 char *previousOutput;
 
 int runCommand(char *command);
@@ -67,12 +66,11 @@ int runCommand(char *command){
             strcat(outputString, readChar);
             memset(readChar, 0, 1025);
         }
-        
+
         int status;
         wait(&status);
         if(WIFEXITED(status)){
             if(strcmp(previousOutput, outputString)==0){
-                printf("\n");
             }else{
                 previousOutput=calloc(outputSize, sizeof(char));
                 if(previousOutput==NULL){
@@ -81,7 +79,7 @@ int runCommand(char *command){
                 }
                 strcpy(previousOutput, outputString);
                 printf("%s\n", outputString);
-                printf("exit %d\n", WEXITSTATUS(status));
+                // printf("exit %d\n", WEXITSTATUS(status));
             }
         }
         return WEXITSTATUS(status);
@@ -110,35 +108,39 @@ int main(int argc, char *argv[])
             case 'c':
                 if(printReturnCode==false){
                     printReturnCode=true;
-                    printf("Return code true\n");
+                    // printf("Return code true\n");
                 }
                 break;
             case 'i':
                 if(intervalSet==false){
-                    interval=atoi(argv[optind-1]);
+                    // interval=atoi(argv[optind-1]);
+                    interval=atoi(optarg);
                     intervalSet=true;
-                    printf("Set interval to %d\n", interval);
+                    // printf("Set interval to %d\n", interval);
                 }
                 break;
             case 't':
                 if(timeFormatSet==false){
                     timeFormatSet=true;
-                    strcpy(timeFormat, argv[optind-1]);
-                    printf("Set time format to %s\n", timeFormat);
+                    // strcpy(timeFormat, argv[optind-1]);
+                    strcpy(timeFormat, optarg);
+                    // printf("Set time format to %s\n", timeFormat);
                 }
                 break;
             case 'l':
             if(limitSet==false){
                 limitSet=true;
-                limitOfIterations=atoi(argv[optind-1]);
-                printf("Set limit to %d\n", limitOfIterations);
+                // limitOfIterations=atoi(argv[opind-1]);
+                limitOfIterations=atoi(optarg);
+                // printf("Set limit to %d\n", limitOfIterations);
             }
                 break;
             case '?':
-                printf("Option is needed\n");
+                // printf("Option is needed\n");
+                exit(0);
                 break;            
             default:
-                printf("default\n");
+                // printf("default\n");
                 break;
         }
     }
@@ -148,7 +150,6 @@ int main(int argc, char *argv[])
     for(int i=0;i<length;i++){
         sprintf(command, "%s %s", command, argv2[i+progStartIndex]);
     }
-    printf("command: %s\n", command);
 
     previousOutput=calloc(MAXSIZE+1, sizeof(char));
     if(previousOutput==NULL){
@@ -165,6 +166,7 @@ int main(int argc, char *argv[])
             printf("%s\n", currentTime);
         }
         int exitStatus=runCommand(command);
+        if(printReturnCode==true) printf("exit %d\n", exitStatus);
         usleep(interval*1000);
         counter++;
     }
