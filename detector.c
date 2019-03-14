@@ -85,7 +85,6 @@ int runCommand(char *command){
                     exit(0);
                 }
                 memcpy(previousOutput, outputString,nbRead);
-                // printf("%s", outputString);
                 write(1, outputString, nbRead);
             }
         }
@@ -119,27 +118,22 @@ int main(int argc, char *argv[])
             case 'c':
                 if(printReturnCode==false){
                     printReturnCode=true;
-                    // printf("Return code true\n");
                 }
                 break;
             case 'i':
                 if(intervalSet==false){
-                    // interval=atoi(argv[optind-1]);
                     interval=atoi(optarg);
                     if(interval <=0){
                         usage(argv[0]);
                         exit(1);
                     }
                     intervalSet=true;
-                    // printf("Set interval to %d\n", interval);
                 }
                 break;
             case 't':
                 if(timeFormatSet==false){
                     timeFormatSet=true;
-                    // strcpy(timeFormat, argv[optind-1]);
                     strcpy(timeFormat, optarg);
-                    // printf("Set time format to %s\n", timeFormat);
                 }
                 break;
             case 'l':
