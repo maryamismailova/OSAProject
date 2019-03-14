@@ -1,0 +1,41 @@
++ DN=/dev/null
++ ./detecter
+usage:
+ ./detecter [-t format ] [-i interval ] [ -l limit ] [-c ] prog arg ...arg
+ -t	printing date and time for each launch, using specified format( strftime() )
+ -i	the interval (in milliseconds) between to program launch
+ -l	the limit of launch number or 0 for no limit
+ -c	detects modifications of return code
++ ./detecter -i1 -l 1 cat /dev/null
++ ./detecter -l1 -i 1 cat /dev/null
++ ./detecter -i 0 cat /dev/null
+usage:
+ ./detecter [-t format ] [-i interval ] [ -l limit ] [-c ] prog arg ...arg
+ -t	printing date and time for each launch, using specified format( strftime() )
+ -i	the interval (in milliseconds) between to program launch
+ -l	the limit of launch number or 0 for no limit
+ -c	detects modifications of return code
++ ./detecter -i -1 cat /dev/null
+usage:
+ ./detecter [-t format ] [-i interval ] [ -l limit ] [-c ] prog arg ...arg
+ -t	printing date and time for each launch, using specified format( strftime() )
+ -i	the interval (in milliseconds) between to program launch
+ -l	the limit of launch number or 0 for no limit
+ -c	detects modifications of return code
++ ./detecter -l -1 cat /dev/null
+usage:
+ ./detecter [-t format ] [-i interval ] [ -l limit ] [-c ] prog arg ...arg
+ -t	printing date and time for each launch, using specified format( strftime() )
+ -i	the interval (in milliseconds) between to program launch
+ -l	the limit of launch number or 0 for no limit
+ -c	detects modifications of return code
++ ./detecter -i1 -l1
+usage:
+ ./detecter [-t format ] [-i interval ] [ -l limit ] [-c ] prog arg ...arg
+ -t	printing date and time for each launch, using specified format( strftime() )
+ -i	the interval (in milliseconds) between to program launch
+ -l	the limit of launch number or 0 for no limit
+ -c	detects modifications of return code
++ ./detecter -c -i1 -l1 cat /dev/null
++ ./detecter -t %S -c -i1 -l1 cat /dev/null
++ exit 0
