@@ -20,7 +20,7 @@ char timeFormat[100];
 int limitOfIterations=0;//0 for infinity
 char *previousOutput;
 int prevOutputSize=0;
-int prevExitStatus=0;
+int prevExitStatus=-1;
 
 int runCommand(char *command);
 
@@ -82,7 +82,6 @@ int runCommand(char *command){
                     exit(0);
                 }
                 memcpy(previousOutput, outputString,nbRead);
-                // printf("%s", outputString);
                 write(1, outputString, nbRead);
             }
         }
@@ -97,6 +96,7 @@ int main(int argc, char *argv[])
     }
     int progStartIndex=-1;
     int opt=-1;
+    //copy the arguments into an array
     char **argv2=calloc(argc, sizeof(char *));
     if(argv2==NULL){
         perror("Calloc");
@@ -116,27 +116,22 @@ int main(int argc, char *argv[])
             case 'c':
                 if(printReturnCode==false){
                     printReturnCode=true;
-                    // printf("Return code true\n");
                 }
                 break;
             case 'i':
                 if(intervalSet==false){
-                    // interval=atoi(argv[optind-1]);
                     interval=atoi(optarg);
                     if(interval <=0){
                         usage(argv[0]);
                         exit(1);
                     }
                     intervalSet=true;
-                    // printf("Set interval to %d\n", interval);
                 }
                 break;
             case 't':
                 if(timeFormatSet==false){
                     timeFormatSet=true;
-                    // strcpy(timeFormat, argv[optind-1]);
                     strcpy(timeFormat, optarg);
-                    // printf("Set time format to %s\n", timeFormat);
                 }
                 break;
             case 'l':
@@ -178,7 +173,7 @@ int main(int argc, char *argv[])
     }
     int counter=0;
     while(counter<limitOfIterations || limitSet==false){
-        if(timeFormatSet){
+        if(timeFormatSet){//get current time if -t option is provided
             char currentTime[100];
             time_t curTime=time(NULL);
             struct tm* locTime=localtime(&curTime);
@@ -188,9 +183,12 @@ int main(int argc, char *argv[])
         }
         int exitStatus=runCommand(command);
         if(printReturnCode==true){
-                char exString[100];
-                sprintf(exString , "exit %d\n", exitStatus);
-                write(1, exString, strlen(exString));
+                if(prevExitStatus!=exitStatus){
+                    char exString[100];
+                    sprintf(exString , "exit %d\n", exitStatus);
+                    write(1, exString, strlen(exString));
+                    prevExitStatus=exitStatus;
+                }
         }
         usleep(interval*1000);
         counter++;
