@@ -28,6 +28,7 @@ PROGS	= detecter
 all: ctags $(PROGS)
 
 detecter:
+	gcc detector.c -o detecter
 
 coverage: clean
 	$(MAKE) COVERAGE=$(COV)
@@ -39,7 +40,7 @@ gcov:
 # Si on souhaite utiliser valgrind (conseillé), positionner la
 # variable VALGRIND ou utiliser la cible "test-avec-valgrind"
 
-test:	test-sans-valgrind
+test:	test-sans-valgrind detecter
 
 test-sans-valgrind: all
 	@for i in test-*.sh ; do echo $$i ; sh $$i || exit 1 ; done
